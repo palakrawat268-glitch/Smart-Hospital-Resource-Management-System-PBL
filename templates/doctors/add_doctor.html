@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Add Doctor &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h4 class="fw-bold mb-0">
+                    <i class="fa-solid fa-user-doctor text-primary me-2"></i>Add Doctor Profile
+                </h4>
+                <p class="text-muted small mb-0">Module 3: Yash Yadav &bull; Assign initial OS CPU Priority Level</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('doctor.add_doctor') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Doctor Full Name</label>
+                            <input type="text" name="doctorName" class="form-control" placeholder="Dr. Sarah Connor" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="doctorEmail" class="form-control" placeholder="doctor@hospital.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            <input type="text" name="doctorPhone" class="form-control" placeholder="+91 9876543210" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Department</label>
+                            <input type="text" name="doctorDepartment" class="form-control" placeholder="Cardiology, ICU, General..." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Specialization</label>
+                            <input type="text" name="doctorSpecialization" class="form-control" placeholder="Senior Surgeon, Physician..." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Experience (Years)</label>
+                            <input type="number" name="doctorExperience" class="form-control" min="0" value="5" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-primary">Initial OS CPU Priority Level</label>
+                            <select name="priorityLevel" class="form-select" required>
+                                <option value="Emergency">Emergency (Highest Priority - 1)</option>
+                                <option value="High">High Priority (Priority - 2)</option>
+                                <option value="Medium" selected>Medium Priority (Priority - 3)</option>
+                                <option value="Low">Low Priority (Priority - 4)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('doctor.doctor_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold">Save Doctor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Patients Directory &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-hospital-user text-primary me-2"></i>Patient Management & PCB Lifecycle</h3>
+        <p class="text-muted mb-0">Module 2: Prasoon Joshi &bull; Process Creation & State Transition (Waiting &rarr; Admitted &rarr; Discharged)</p>
+    </div>
+    <a href="{{ url_for('patient.add_patient') }}" class="btn btn-primary fw-semibold">
+        <i class="fa-solid fa-user-plus me-1"></i> Register New Patient
+    </a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card shadow-sm border-0 mb-4 p-3 bg-white">
+    <form method="GET" class="row g-2">
+        <div class="col-md-7">
+            <input type="text" name="search" class="form-control" placeholder="Search by patient name..." value="{{ searchQuery }}">
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="Waiting" {% if statusFilter == 'Waiting' %}selected{% endif %}>Waiting (Ready Queue)</option>
+                <option value="Admitted" {% if statusFilter == 'Admitted' %}selected{% endif %}>Admitted (Running / In Bed)</option>
+                <option value="Discharged" {% if statusFilter == 'Discharged' %}selected{% endif %}>Discharged (Terminated)</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            <a href="{{ url_for('patient.patient_list') }}" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Patients Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID (PID)</th>
+                        <th>Patient Name</th>
+                        <th>Lifecycle Status</th>
+                        <th>Assigned Ward</th>
+                        <th>Assigned Bed</th>
+                        <th>Registered At</th>
+                        <th class="text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if patients %}
+                        {% for p in patients %}
+                        <tr>
+                            <td><code>#{{ p.patient_id }}</code></td>
+                            <td><strong>{{ p.patientName }}</strong></td>
+                            <td>
+                                {% if p.patientStatus == 'Waiting' %}
+                                    <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Waiting</span>
+                                {% elif p.patientStatus == 'Admitted' %}
+                                    <span class="badge bg-success"><i class="fa-solid fa-bed-pulse me-1"></i> Admitted</span>
+                                {% else %}
+                                    <span class="badge bg-secondary"><i class="fa-solid fa-check me-1"></i> Discharged</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ p.assignedWard or '-' }}</td>
+                            <td>{{ p.assignedBed or '-' }}</td>
+                            <td class="small text-muted">{{ p.created_at.strftime('%Y-%m-%d %H:%M') if p.created_at else '-' }}</td>
+                            <td class="text-end pe-3">
+                                <a href="{{ url_for('patient.edit_patient', pid=p.patient_id) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                                {% if p.patientStatus != 'Admitted' %}
+                                <a href="{{ url_for('patient.delete_patient', pid=p.patient_id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete record for {{ p.patientName }}?');">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No patient records found. Click <strong>Register New Patient</strong> to add one.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

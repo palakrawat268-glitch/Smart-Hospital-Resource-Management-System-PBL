@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Equipment Catalog &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-boxes-stacked text-primary me-2"></i>Medical Equipment Inventory & Catalog
+        </h3>
+        <p class="text-muted mb-0">Module 5: Kanishk Ramola &bull; Resource Vector Management & Concurrency Mutex</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('equipment.allocation_page') }}" class="btn btn-outline-danger fw-semibold">
+            <i class="fa-solid fa-scale-balanced me-1"></i> Banker's Matrix
+        </a>
+        <button class="btn btn-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+            <i class="fa-solid fa-plus me-1"></i> Add Equipment
+        </button>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Total Equipment Items</span>
+            <h2 class="fw-bold text-primary mt-2 mb-0">{{ stats.totalEquipment }}</h2>
+            <small class="text-muted">Registered Catalog</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Available Units</span>
+            <h2 class="fw-bold text-success mt-2 mb-0">{{ stats.availableEquipment }}</h2>
+            <small class="text-muted">Free Allocation Vector</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Currently In Use</span>
+            <h2 class="fw-bold text-warning mt-2 mb-0">{{ stats.inUseEquipment }}</h2>
+            <small class="text-muted">Assigned to Patients</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">In Maintenance</span>
+            <h2 class="fw-bold text-danger mt-2 mb-0">{{ stats.maintenanceEquipment }}</h2>
+            <small class="text-muted">Unavailable for Safe State</small>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Table -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Equipment Name</th>
+                        <th>Category / Type</th>
+                        <th>Status</th>
+                        <th>Available Units</th>
+                        <th>Location</th>
+                        <th>Maintenance Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if equipment_list %}
+                        {% for eq in equipment_list %}
+                        <tr>
+                            <td><code>#{{ eq.equipmentId }}</code></td>
+                            <td><strong>{{ eq.equipmentName }}</strong></td>
+                            <td><span class="badge bg-secondary-subtle text-secondary">{{ eq.equipmentType }}</span></td>
+                            <td>
+                                {% if eq.equipmentStatus == 'Available' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Available</span>
+                                {% elif eq.equipmentStatus == 'In Use' %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">In Use</span>
+                                {% elif eq.equipmentStatus == 'Maintenance' %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Maintenance</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-info text-dark fs-6">{{ eq.equipmentAvailability }} Units</span></td>
+                            <td><i class="fa-solid fa-location-dot text-muted me-1"></i>{{ eq.equipmentLocation }}</td>
+                            <td class="small text-muted">{{ eq.maintenanceDate or 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No equipment found. Click <strong>Add Equipment</strong> to register stock.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Equipment -->
+<div class="modal fade" id="addEquipmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-plus text-primary me-2"></i>Register New Medical Equipment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('equipment.add_equipment') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Equipment Name</label>
+                        <input type="text" name="equipmentName" class="form-control" placeholder="e.g. Ventilator-A" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Equipment Type</label>
+                        <input type="text" name="equipmentType" class="form-control" placeholder="Life Support, Monitoring, Dialysis..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Initial Status</label>
+                        <select name="equipmentStatus" class="form-select">
+                            <option value="Available" selected>Available</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Available Units</label>
+                        <input type="number" name="equipmentAvailability" class="form-control" min="1" value="3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Hospital Location</label>
+                        <input type="text" name="equipmentLocation" class="form-control" placeholder="ICU Ward 1, Emergency OT..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Scheduled Maintenance Date</label>
+                        <input type="date" name="maintenanceDate" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Register Equipment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

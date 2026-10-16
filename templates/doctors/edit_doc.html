@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Doctor &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h4 class="fw-bold mb-0">
+                    <i class="fa-solid fa-user-pen text-primary me-2"></i>Edit Doctor Profile
+                </h4>
+                <p class="text-muted small mb-0">Module 3: Yash Yadav &bull; Update Department, Availability, or OS Priority</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('doctor.edit_doctor', id=doctor.doctor_id) }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Doctor Full Name</label>
+                            <input type="text" name="doctorName" class="form-control" value="{{ doctor.doctorName }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="doctorEmail" class="form-control" value="{{ doctor.doctorEmail }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            <input type="text" name="doctorPhone" class="form-control" value="{{ doctor.doctorPhone }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Department</label>
+                            <input type="text" name="doctorDepartment" class="form-control" value="{{ doctor.doctorDepartment }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Specialization</label>
+                            <input type="text" name="doctorSpecialization" class="form-control" value="{{ doctor.doctorSpecialization }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Experience (Years)</label>
+                            <input type="number" name="doctorExperience" class="form-control" min="0" value="{{ doctor.doctorExperience }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Availability</label>
+                            <select name="doctorAvailability" class="form-select">
+                                <option value="Available" {% if doctor.doctorAvailability == 'Available' %}selected{% endif %}>Available</option>
+                                <option value="Busy" {% if doctor.doctorAvailability == 'Busy' %}selected{% endif %}>Busy</option>
+                                <option value="On Leave" {% if doctor.doctorAvailability == 'On Leave' %}selected{% endif %}>On Leave</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Status</label>
+                            <select name="doctorStatus" class="form-select">
+                                <option value="Active" {% if doctor.doctorStatus == 'Active' %}selected{% endif %}>Active</option>
+                                <option value="Inactive" {% if doctor.doctorStatus == 'Inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-primary">OS CPU Priority Level</label>
+                            <select name="priorityLevel" class="form-select">
+                                <option value="Emergency" {% if doctor.priorityLevel == 'Emergency' %}selected{% endif %}>Emergency (Highest Priority - 1)</option>
+                                <option value="High" {% if doctor.priorityLevel == 'High' %}selected{% endif %}>High Priority (Priority - 2)</option>
+                                <option value="Medium" {% if doctor.priorityLevel == 'Medium' %}selected{% endif %}>Medium Priority (Priority - 3)</option>
+                                <option value="Low" {% if doctor.priorityLevel == 'Low' %}selected{% endif %}>Low Priority (Priority - 4)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('doctor.doctor_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold">Update Doctor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

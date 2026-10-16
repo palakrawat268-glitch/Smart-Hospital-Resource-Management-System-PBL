@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Resource Monitor &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-eye text-primary me-2"></i>Unified Resource Monitor
+        </h3>
+        <p class="text-muted mb-0">Module 6: Himesh Kathait &bull; Centralized read-only inspection of Beds, Equipment & Wards</p>
+    </div>
+    <a href="{{ url_for('report.generate_report') }}" class="btn btn-outline-primary fw-semibold">
+        <i class="fa-solid fa-file-export me-1"></i> Generate Detailed Report
+    </a>
+</div>
+
+<!-- Search Bar -->
+<div class="card shadow-sm border-0 mb-4 p-3 bg-white">
+    <form method="GET" class="d-flex gap-2">
+        <input type="text" name="search" class="form-control" placeholder="Search across all resources (Ward name, Bed number, Equipment name)..." value="{{ searchQuery }}">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        <a href="{{ url_for('report.resource_monitor') }}" class="btn btn-outline-secondary">Reset</a>
+    </form>
+</div>
+
+<!-- Tabs for 3 Resource Domains -->
+<ul class="nav nav-pills mb-3" id="resourceTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active fw-semibold" id="beds-tab" data-bs-toggle="pill" data-bs-target="#beds-pane" type="button">
+            <i class="fa-solid fa-bed me-1"></i> Beds ({{ beds|length }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-semibold" id="equipment-tab" data-bs-toggle="pill" data-bs-target="#equipment-pane" type="button">
+            <i class="fa-solid fa-microscope me-1"></i> Medical Equipment ({{ equipment|length }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-semibold" id="wards-tab" data-bs-toggle="pill" data-bs-target="#wards-pane" type="button">
+            <i class="fa-solid fa-hospital me-1"></i> Hospital Wards ({{ wards|length }})
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="resourceTabsContent">
+    <!-- Beds Pane -->
+    <div class="tab-pane fade show active" id="beds-pane">
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Bed Number</th>
+                            <th>Type</th>
+                            <th>Assigned Ward</th>
+                            <th>Status</th>
+                            <th>Assigned Patient</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if beds %}
+                            {% for b in beds %}
+                            <tr>
+                                <td><strong>{{ b.bedNumber }}</strong></td>
+                                <td>{{ b.bedType }}</td>
+                                <td><span class="badge bg-info-subtle text-info border">{{ b.assignedWard }}</span></td>
+                                <td>
+                                    {% if b.bedStatus == 'Available' %}
+                                        <span class="badge bg-success">Available</span>
+                                    {% elif b.bedStatus == 'Occupied' %}
+                                        <span class="badge bg-danger">Occupied</span>
+                                    {% elif b.bedStatus == 'Reserved' %}
+                                        <span class="badge bg-warning text-dark">Reserved</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Maintenance</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ b.assignedPatient or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted">No beds found.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipment Pane -->
+    <div class="tab-pane fade" id="equipment-pane">
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Equipment Name</th>
+                            <th>Category</th>
+                            <th>Available Units</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if equipment %}
+                            {% for eq in equipment %}
+                            <tr>
+                                <td><strong>{{ eq.equipmentName }}</strong></td>
+                                <td><span class="badge bg-secondary-subtle text-secondary">{{ eq.equipmentType }}</span></td>
+                                <td><span class="badge bg-info text-dark fs-6">{{ eq.equipmentAvailability }} Units</span></td>
+                                <td>
+                                    {% if eq.equipmentStatus == 'Available' %}
+                                        <span class="badge bg-success">Available</span>
+                                    {% elif eq.equipmentStatus == 'In Use' %}
+                                        <span class="badge bg-warning text-dark">In Use</span>
+                                    {% elif eq.equipmentStatus == 'Maintenance' %}
+                                        <span class="badge bg-danger">Maintenance</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Unavailable</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ eq.equipmentLocation }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted">No equipment found.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wards Pane -->
+    <div class="tab-pane fade" id="wards-pane">
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ward Name</th>
+                            <th>Type</th>
+                            <th>Total Capacity</th>
+                            <th>Occupied Beds</th>
+                            <th>Available Beds</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if wards %}
+                            {% for w in wards %}
+                            <tr>
+                                <td><strong>{{ w.wardName }}</strong></td>
+                                <td><span class="badge bg-info-subtle text-info border">{{ w.wardType }}</span></td>
+                                <td>{{ w.wardCapacity }} beds</td>
+                                <td><span class="text-danger fw-bold">{{ w.occupiedBeds }}</span></td>
+                                <td><span class="text-success fw-bold">{{ w.availableBeds }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted">No wards found.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

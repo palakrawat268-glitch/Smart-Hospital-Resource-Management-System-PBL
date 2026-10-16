@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Banker's Algorithm Allocation &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-scale-balanced text-danger me-2"></i>Banker's Algorithm & Resource Safety Engine
+        </h3>
+        <p class="text-muted mb-0">Module 5: Kanishk Ramola &bull; Deadlock Avoidance, Safety Evaluation & Concurrency Mutex</p>
+    </div>
+    <div>
+        <a href="{{ url_for('equipment.run_deadlock_check') }}" class="btn btn-outline-danger fw-semibold">
+            <i class="fa-solid fa-shield-halved me-1"></i> Run Deadlock Detection Check
+        </a>
+    </div>
+</div>
+
+<!-- OS Banker's Safety Banner -->
+{% if os_state %}
+<div class="alert {% if os_state.is_safe %}alert-success border-success{% else %}alert-danger border-danger{% endif %} shadow-sm p-4 mb-4" role="alert">
+    <div class="d-flex align-items-center gap-3">
+        <i class="fa-solid {% if os_state.is_safe %}fa-circle-check text-success{% else %}fa-triangle-exclamation text-danger{% endif %} display-6"></i>
+        <div>
+            <h4 class="alert-heading fw-bold mb-1">
+                System State: {% if os_state.is_safe %}<span class="text-success">SAFE (Deadlock Avoided)</span>{% else %}<span class="text-danger">UNSAFE</span>{% endif %}
+            </h4>
+            <p class="mb-0">
+                {% if os_state.is_safe %}
+                    <strong>Safe Sequence:</strong>
+                    {% for p in os_state.safeSequence %}
+                        <span class="badge bg-success fs-6 me-1">{{ p }}</span> {% if not loop.last %} &rarr; {% endif %}
+                    {% endfor %}
+                    <br><small class="text-muted">All active patient claims can be satisfied without deadlock risk.</small>
+                {% else %}
+                    <strong>Warning:</strong> No safe sequence exists! Granting further requests would risk entering a circular deadlock.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4 mb-4">
+    <!-- Allocation Form -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-paper-plane text-primary me-2"></i>Request Equipment Allocation</h5>
+                <small class="text-muted">Evaluated by Banker's Algorithm before granting</small>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('equipment.allocate_equipment') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Select Patient / Ward Process</label>
+                        <select name="patientId" class="form-select" required>
+                            <option value="" disabled selected>-- Choose Patient / Process --</option>
+                            {% for p in patient_ids %}
+                                <option value="{{ p }}">{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Select Medical Equipment</label>
+                        <select name="equipmentId" class="form-select" required>
+                            <option value="" disabled selected>-- Choose Equipment --</option>
+                            {% for eq in equipment_list %}
+                                <option value="{{ eq.equipmentId }}" {% if eq.equipmentAvailability <= 0 %}disabled{% endif %}>
+                                    {{ eq.equipmentName }} (Free: {{ eq.equipmentAvailability }} | Loc: {{ eq.equipmentLocation }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Quantity to Allocate (<code>requestedResources</code>)</label>
+                        <input type="number" name="requestedResources" class="form-control" value="1" min="1" max="10" required>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                            <i class="fa-solid fa-shield-check me-2"></i> Run Safety Check & Allocate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Claims & Allocations -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-table text-primary me-2"></i>Patient Resource Claims (Banker's Matrix)</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Equipment ID</th>
+                            <th>Max Need</th>
+                            <th>Allocated</th>
+                            <th>Remaining Need</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if claims %}
+                            {% for c in claims %}
+                            <tr>
+                                <td><strong>{{ c.patientId }}</strong></td>
+                                <td><code>Eq #{{ c.equipmentId }}</code></td>
+                                <td><span class="badge bg-secondary">{{ c.maximumNeed }}</span></td>
+                                <td><span class="badge bg-primary">{{ c.allocatedNeed }}</span></td>
+                                <td><span class="badge bg-warning text-dark">{{ c.remainingNeed }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">No patient claims registered.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check text-primary me-2"></i>Active Equipment Allocations</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Alloc ID</th>
+                            <th>Patient</th>
+                            <th>Eq ID</th>
+                            <th>Qty</th>
+                            <th>Status</th>
+                            <th class="text-end pe-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if allocations %}
+                            {% for a in allocations %}
+                            <tr>
+                                <td>#{{ a.allocationId }}</td>
+                                <td><strong>{{ a.patientId }}</strong></td>
+                                <td>Eq #{{ a.equipmentId }}</td>
+                                <td>{{ a.allocatedResources }} unit(s)</td>
+                                <td>
+                                    {% if a.resourceStatus == 'Allocated' %}
+                                        <span class="badge bg-success">Allocated</span>
+                                    {% elif a.resourceStatus == 'Released' %}
+                                        <span class="badge bg-secondary">Released</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">{{ a.resourceStatus }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end pe-3">
+                                    {% if a.resourceStatus == 'Allocated' %}
+                                    <form action="{{ url_for('equipment.release_equipment', allocation_id=a.allocationId) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Release</button>
+                                    </form>
+                                    {% else %}
+                                        <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-3 text-muted">No active allocations.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

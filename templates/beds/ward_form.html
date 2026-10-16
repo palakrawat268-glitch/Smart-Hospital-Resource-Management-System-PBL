@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Ward &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h4 class="fw-bold mb-0">
+                    <i class="fa-solid fa-hospital text-primary me-2"></i>{{ action }} Ward (Partition)
+                </h4>
+                <p class="text-muted small mb-0">Module 4: Sujal Kumar &bull; Set memory partition size and type</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ward Name</label>
+                        <input type="text" name="wardName" class="form-control" placeholder="e.g. ICU Ward Alpha" value="{{ ward.wardName if ward else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ward Type</label>
+                        <select name="wardType" class="form-select" required>
+                            <option value="General" {% if ward and ward.wardType == 'General' %}selected{% endif %}>General Ward</option>
+                            <option value="ICU" {% if ward and ward.wardType == 'ICU' %}selected{% endif %}>Intensive Care Unit (ICU)</option>
+                            <option value="Emergency" {% if ward and ward.wardType == 'Emergency' %}selected{% endif %}>Emergency Ward</option>
+                            <option value="Pediatric" {% if ward and ward.wardType == 'Pediatric' %}selected{% endif %}>Pediatric Ward</option>
+                            <option value="Maternity" {% if ward and ward.wardType == 'Maternity' %}selected{% endif %}>Maternity Ward</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Bed Capacity (Maximum Partition Frames)</label>
+                        <input type="number" name="wardCapacity" class="form-control" min="1" value="{{ ward.wardCapacity if ward else 10 }}" required>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('bed.ward_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold">{{ action }} Ward</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

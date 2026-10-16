@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Resource Monitoring Dashboard &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-chart-line text-primary me-2"></i>Reports & Resource Monitoring Dashboard
+        </h3>
+        <p class="text-muted mb-0">Module 6: Himesh Kathait &bull; Hospital Utilization Metrics, Capacity Alerts & Audit Logs</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('report.generate_report') }}" class="btn btn-primary fw-semibold">
+            <i class="fa-solid fa-file-export me-1"></i> Generate Reports
+        </a>
+        <a href="{{ url_for('report.resource_monitor') }}" class="btn btn-outline-secondary fw-semibold">
+            <i class="fa-solid fa-eye me-1"></i> Resource Monitor
+        </a>
+    </div>
+</div>
+
+<!-- Low Bed Capacity Alert (< 20% available) -->
+{% if lowBedWards %}
+<div class="alert alert-danger shadow-sm border-0 mb-4 p-3" role="alert">
+    <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="fa-solid fa-triangle-exclamation fs-4"></i>
+        <h5 class="fw-bold mb-0">Critical Low Bed Availability Alert (&lt;20% Free Capacity)!</h5>
+    </div>
+    <ul class="mb-0 small">
+        {% for w in lowBedWards %}
+            <li><strong>{{ w.wardName }}</strong> ({{ w.wardType }}): Only {{ w.availableBeds }} of {{ w.wardCapacity }} beds free ({{ ((w.availableBeds / w.wardCapacity) * 100)|round(1) }}%)</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- 8 Core Metrics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Total Patients</div>
+            <h2 class="fw-bold text-primary mt-2 mb-0">{{ stats.totalPatients }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Total Doctors</div>
+            <h2 class="fw-bold text-success mt-2 mb-0">{{ stats.totalDoctors }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-info border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Total Appointments</div>
+            <h2 class="fw-bold text-info mt-2 mb-0">{{ stats.totalAppointments }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Available Beds</div>
+            <h2 class="fw-bold text-success mt-2 mb-0">{{ stats.availableBeds }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Occupied Beds</div>
+            <h2 class="fw-bold text-danger mt-2 mb-0">{{ stats.occupiedBeds }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Available Equipment</div>
+            <h2 class="fw-bold text-primary mt-2 mb-0">{{ stats.availableEquipment }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Pending Requests</div>
+            <h2 class="fw-bold text-warning mt-2 mb-0">{{ stats.pendingRequests }}</h2>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 p-3 bg-white">
+            <div class="text-muted small text-uppercase fw-semibold">Emergency Cases</div>
+            <h2 class="fw-bold text-danger mt-2 mb-0">{{ stats.emergencyCases }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Appointment Status Breakdown -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check text-primary me-2"></i>Appointment Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 text-center">
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded border">
+                            <span class="text-muted small">Pending</span>
+                            <h4 class="fw-bold text-warning mb-0">{{ appointmentSummary.Pending }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded border">
+                            <span class="text-muted small">Confirmed</span>
+                            <h4 class="fw-bold text-success mb-0">{{ appointmentSummary.Confirmed }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded border">
+                            <span class="text-muted small">Completed</span>
+                            <h4 class="fw-bold text-info mb-0">{{ appointmentSummary.Completed }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded border">
+                            <span class="text-muted small">Cancelled</span>
+                            <h4 class="fw-bold text-danger mb-0">{{ appointmentSummary.Cancelled }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Equipment Alert -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-wrench text-danger me-2"></i>Equipment Under Maintenance</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Scheduled Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if maintenanceEquipment %}
+                                {% for eq in maintenanceEquipment %}
+                                <tr>
+                                    <td><strong>{{ eq.equipmentName }}</strong></td>
+                                    <td><span class="badge bg-secondary-subtle text-secondary">{{ eq.equipmentType }}</span></td>
+                                    <td>{{ eq.equipmentLocation }}</td>
+                                    <td><small class="text-muted">{{ eq.maintenanceDate or 'Immediate' }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">All medical equipment operational. None under maintenance.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

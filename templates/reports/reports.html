@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Reports Generator &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-file-invoice text-primary me-2"></i>Hospital Report Generation & Export
+        </h3>
+        <p class="text-muted mb-0">Module 6: Himesh Kathait &bull; Dynamic Report Engine with CSV Export Pipeline</p>
+    </div>
+</div>
+
+<!-- Report Selection Form -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-filter text-primary me-2"></i>Select Report Scope</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-8">
+                    <select name="reportType" class="form-select form-select-lg">
+                        <option value="all" {% if reportType == 'all' %}selected{% endif %}>Complete Hospital Utilization Report</option>
+                        <option value="patients" {% if reportType == 'patients' %}selected{% endif %}>Patient Roster & Admittance Report</option>
+                        <option value="doctors" {% if reportType == 'doctors' %}selected{% endif %}>Doctor Directory & OS CPU Priority Report</option>
+                        <option value="appointments" {% if reportType == 'appointments' %}selected{% endif %}>Appointments & Emergency Log Report</option>
+                        <option value="beds" {% if reportType == 'beds' %}selected{% endif %}>Bed & Ward Partitioning Report</option>
+                        <option value="equipment" {% if reportType == 'equipment' %}selected{% endif %}>Medical Equipment Inventory Report</option>
+                        <option value="resources" {% if reportType == 'resources' %}selected{% endif %}>Banker's Resource Allocation Report</option>
+                        <option value="deadlock" {% if reportType == 'deadlock' %}selected{% endif %}>OS Deadlock Detection Audit Log Report</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+                        <i class="fa-solid fa-bolt me-1"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Rendered Report Output -->
+{% if reportData %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-0 text-white">{{ reportData.title }}</h5>
+            <small class="text-white-50">Generated At: {{ generatedAt }}</small>
+        </div>
+        <div>
+            <a href="{{ url_for('report.export_csv', type=reportData.type) }}" class="btn btn-light btn-sm fw-bold text-primary">
+                <i class="fa-solid fa-download me-1"></i> Download CSV
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if reportData.type == 'all' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Hospital Utilization Metric</th>
+                            <th>Current System Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for k, v in reportData.stats.items() %}
+                        <tr>
+                            <td class="fw-semibold">{{ k }}</td>
+                            <td><span class="badge bg-primary fs-6">{{ v }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'patients' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>ID</th><th>Patient Name</th><th>Status</th><th>Assigned Ward</th><th>Assigned Bed</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td>#{{ r.patient_id }}</td><td><strong>{{ r.patientName }}</strong></td><td>{{ r.patientStatus }}</td><td>{{ r.assignedWard or '-' }}</td><td>{{ r.assignedBed or '-' }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'doctors' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>ID</th><th>Doctor Name</th><th>Department</th><th>Priority Level</th><th>Queue Pos</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td>#{{ r.doctor_id }}</td><td><strong>{{ r.doctorName }}</strong></td><td>{{ r.doctorDepartment }}</td><td>{{ r.priorityLevel }}</td><td>{{ r.queuePosition }}</td><td>{{ r.doctorStatus }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'beds' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Bed Number</th><th>Type</th><th>Ward</th><th>Status</th><th>Patient</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td><strong>{{ r.bedNumber }}</strong></td><td>{{ r.bedType }}</td><td>{{ r.assignedWard }}</td><td>{{ r.bedStatus }}</td><td>{{ r.assignedPatient or '-' }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'equipment' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>ID</th><th>Equipment Name</th><th>Type</th><th>Status</th><th>Available</th><th>Location</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td>#{{ r.equipmentId }}</td><td><strong>{{ r.equipmentName }}</strong></td><td>{{ r.equipmentType }}</td><td>{{ r.equipmentStatus }}</td><td>{{ r.equipmentAvailability }} Units</td><td>{{ r.equipmentLocation }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'resources' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Alloc ID</th><th>Equipment ID</th><th>Patient ID</th><th>Allocated</th><th>Requested</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td>#{{ r.allocationId }}</td><td>Eq #{{ r.equipmentId }}</td><td>{{ r.patientId }}</td><td>{{ r.allocatedResources }}</td><td>{{ r.requestedResources }}</td><td>{{ r.resourceStatus }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'deadlock' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Log ID</th><th>Status</th><th>Blocked Processes</th><th>Waiting Queue</th><th>Detected At</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td>#{{ r.log_id }}</td><td><span class="badge {% if r.deadlockStatus == 'Deadlock Detected' %}bg-danger{% else %}bg-success{% endif %}">{{ r.deadlockStatus }}</span></td><td>{{ r.blockedProcesses or 'None' }}</td><td>{{ r.waitingQueue or 'None' }}</td><td>{{ r.detectedAt }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif reportData.type == 'appointments' %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>ID</th><th>Date</th><th>Time</th><th>Type</th><th>Status</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reportData.rows %}
+                        <tr><td>#{{ r.appointment_id }}</td><td>{{ r.appointmentDate }}</td><td>{{ r.appointmentTime }}</td><td>{{ r.appointmentType }}</td><td>{{ r.appointmentStatus }}</td><td>{{ r.appointmentReason }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

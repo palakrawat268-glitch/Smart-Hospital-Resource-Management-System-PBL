@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Ward Directory &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-hospital text-primary me-2"></i>Ward Directory (Partitions)</h3>
+        <p class="text-muted mb-0">Module 4: Sujal Kumar &bull; Track capacity, occupancy progress, and available frames</p>
+    </div>
+    <a href="{{ url_for('bed.add_ward') }}" class="btn btn-primary fw-semibold">+ Add Ward</a>
+</div>
+
+<!-- Search Form -->
+<div class="card shadow-sm border-0 mb-4 p-3 bg-white">
+    <form method="GET" class="d-flex gap-2">
+        <input type="text" name="search" class="form-control" placeholder="Search by Ward Name or Type..." value="{{ searchQuery }}">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        <a href="{{ url_for('bed.ward_list') }}" class="btn btn-outline-secondary">Reset</a>
+    </form>
+</div>
+
+<!-- Wards Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ward Name</th>
+                        <th>Type</th>
+                        <th>Max Capacity</th>
+                        <th>Occupied</th>
+                        <th>Available</th>
+                        <th style="width: 25%;">Occupancy Progress</th>
+                        <th class="text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if wards %}
+                        {% for w in wards %}
+                        {% set pct = ((w.occupiedBeds / w.wardCapacity) * 100)|round(0)|int if w.wardCapacity else 0 %}
+                        <tr>
+                            <td><strong>{{ w.wardName }}</strong></td>
+                            <td><span class="badge bg-info text-dark">{{ w.wardType }}</span></td>
+                            <td>{{ w.wardCapacity }} beds</td>
+                            <td><span class="text-danger fw-bold">{{ w.occupiedBeds }}</span></td>
+                            <td><span class="text-success fw-bold">{{ w.availableBeds }}</span></td>
+                            <td>
+                                <div class="progress" style="height: 18px;">
+                                    <div class="progress-bar {% if pct > 80 %}bg-danger{% elif pct > 50 %}bg-warning text-dark{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ pct }}%;">
+                                        {{ pct }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end pe-3">
+                                <a href="{{ url_for('bed.edit_ward', wid=w.ward_id) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                                <a href="{{ url_for('bed.delete_ward', wid=w.ward_id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete {{ w.wardName }}?');">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No wards found. Click <strong>+ Add Ward</strong> to create one.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

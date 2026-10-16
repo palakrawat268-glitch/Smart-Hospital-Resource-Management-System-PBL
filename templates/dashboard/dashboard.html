@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Dashboard &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-gauge-high text-primary me-2"></i>Hospital Resource Command Center
+        </h2>
+        <p class="text-muted mb-0">
+            Real-time synchronization across CPU Scheduling, Dynamic Partitioning, Banker's Deadlock Avoidance, and Audit Reports.
+        </p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
+            <i class="fa-solid fa-circle-check me-1"></i> System Status: Operational
+        </span>
+    </div>
+</div>
+
+<!-- 8 Live Integration Stat Cards -->
+<div class="row g-3 mb-4">
+    <!-- Total Doctors (Yash) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Total Doctors</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-primary">{{ totalDoctors }}</h3>
+                    <div class="bg-primary-subtle text-primary p-2 rounded-circle"><i class="fa-solid fa-user-doctor fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Yash &bull; FCFS/Priority</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Cases (Yash) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Emergency Cases</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-danger">{{ emergencyCases }}</h3>
+                    <div class="bg-danger-subtle text-danger p-2 rounded-circle"><i class="fa-solid fa-truck-medical fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-danger-subtle text-danger">Priority 1 Queue</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Beds (Sujal) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Available Beds</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-success">{{ availableBeds }}</h3>
+                    <div class="bg-success-subtle text-success p-2 rounded-circle"><i class="fa-solid fa-bed fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Sujal &bull; Free Frames</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Occupied Beds (Sujal) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Occupied Beds</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-warning">{{ occupiedBeds }}</h3>
+                    <div class="bg-warning-subtle text-warning p-2 rounded-circle"><i class="fa-solid fa-bed-pulse fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Dynamic Allocated</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Equipment (Kanishk) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Available Equipment</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-info">{{ availableEquipment }}</h3>
+                    <div class="bg-info-subtle text-info p-2 rounded-circle"><i class="fa-solid fa-microscope fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Kanishk &bull; Free Vector</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests (Kanishk) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-secondary border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Pending Claims</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-secondary">{{ pendingRequests }}</h3>
+                    <div class="bg-secondary-subtle text-secondary p-2 rounded-circle"><i class="fa-solid fa-clipboard-list fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Banker's Wait Queue</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Patients (Prasoon) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Total Patients</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-primary">{{ totalPatients }}</h3>
+                    <div class="bg-primary-subtle text-primary p-2 rounded-circle"><i class="fa-solid fa-hospital-user fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Prasoon &bull; Active PCBs</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Appointments / Reports (Himesh) -->
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-dark border-4 h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Total Appointments</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <h3 class="fw-bold mb-0 text-dark">{{ totalAppointments }}</h3>
+                    <div class="bg-dark-subtle text-dark p-2 rounded-circle"><i class="fa-solid fa-calendar-check fs-5"></i></div>
+                </div>
+                <div class="small text-muted mt-2"><span class="badge bg-light text-dark">Himesh &bull; Reports & Logs</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team Integration Architecture Card -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-network-wired text-primary me-2"></i>Module & OS Concept Architecture Directory</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Module</th>
+                        <th>Student Lead</th>
+                        <th>Module Domain</th>
+                        <th>Operating System Algorithm</th>
+                        <th class="text-end pe-4">Quick Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-primary">Module 1</span></td>
+                        <td><strong>Palak Rawat</strong> <span class="text-muted small">(Team Lead)</span></td>
+                        <td>Authentication & Central Dashboard</td>
+                        <td><span class="badge bg-info-subtle text-info border">Process Synchronization & Session Control</span></td>
+                        <td class="text-end pe-4"><a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-sm btn-outline-primary">View Dashboard</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-secondary">Module 2</span></td>
+                        <td><strong>Prasoon Joshi</strong></td>
+                        <td>Patient Management & Admission</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border">Process Control Block (PCB) Representation</span></td>
+                        <td class="text-end pe-4"><a href="{{ url_for('patient.patient_list') }}" class="btn btn-sm btn-outline-secondary">Manage Patients</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-success">Module 3</span></td>
+                        <td><strong>Yash Yadav</strong></td>
+                        <td>Doctor Management & Queue Scheduling</td>
+                        <td><span class="badge bg-success-subtle text-success border">CPU Scheduling (FCFS & Non-Preemptive Priority)</span></td>
+                        <td class="text-end pe-4">
+                            <a href="{{ url_for('os.run_fcfs') }}" class="btn btn-sm btn-success me-1">Run FCFS</a>
+                            <a href="{{ url_for('os.run_priority') }}" class="btn btn-sm btn-warning">Run Priority</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-warning text-dark">Module 4</span></td>
+                        <td><strong>Sujal Kumar</strong></td>
+                        <td>Bed & Ward Management</td>
+                        <td><span class="badge bg-warning-subtle text-warning border">Memory Management (Dynamic Partitioning)</span></td>
+                        <td class="text-end pe-4"><a href="{{ url_for('bed.dashboard') }}" class="btn btn-sm btn-outline-warning text-dark">Bed Overview</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger">Module 5</span></td>
+                        <td><strong>Kanishk Ramola</strong></td>
+                        <td>Medical Equipment Management</td>
+                        <td><span class="badge bg-danger-subtle text-danger border">Banker's Algorithm & Mutex Locks</span></td>
+                        <td class="text-end pe-4"><a href="{{ url_for('equipment.allocation_page') }}" class="btn btn-sm btn-outline-danger">Banker's Matrix</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-dark">Module 6</span></td>
+                        <td><strong>Himesh Kathait</strong></td>
+                        <td>Resource Reports & Deadlock Logs</td>
+                        <td><span class="badge bg-dark-subtle text-dark border">Deadlock Detection & RAG Audit Logs</span></td>
+                        <td class="text-end pe-4"><a href="{{ url_for('report.dashboard') }}" class="btn btn-sm btn-outline-dark">Reports & Audit</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

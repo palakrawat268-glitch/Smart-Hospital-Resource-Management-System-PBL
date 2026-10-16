@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}OS Deadlock Detection Audit Logs &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-bug text-danger me-2"></i>OS Deadlock Detection & Audit Logs
+        </h3>
+        <p class="text-muted mb-0">Module 6: Himesh Kathait &bull; Multi-Instance Deadlock Detection & Resource Graph Audit Trail</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('equipment.run_deadlock_check') }}" class="btn btn-danger fw-semibold">
+            <i class="fa-solid fa-play me-1"></i> Trigger Deadlock Check Now
+        </a>
+        <a href="{{ url_for('report.export_csv', type='deadlock') }}" class="btn btn-outline-secondary fw-semibold">
+            <i class="fa-solid fa-download me-1"></i> Export Logs (CSV)
+        </a>
+    </div>
+</div>
+
+<!-- Active Deadlock Alert -->
+{% if activeDeadlocks %}
+<div class="alert alert-danger shadow-sm border-0 mb-4 p-4" role="alert">
+    <div class="d-flex align-items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation display-6 text-danger"></i>
+        <div>
+            <h4 class="alert-heading fw-bold mb-1">Active Deadlock Detected in Hospital System!</h4>
+            <p class="mb-0">
+                The deadlock detection algorithm has identified processes in a circular wait condition. Equipment must be released or preempted immediately to resume normal execution.
+            </p>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-success shadow-sm border-0 mb-4 p-3 d-flex align-items-center gap-2" role="alert">
+    <i class="fa-solid fa-circle-check fs-4"></i>
+    <div><strong>System State Healthy:</strong> No active deadlocks logged. Resources are allocated safely.</div>
+</div>
+{% endif %}
+
+<!-- Logs Table -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Deadlock Detection Execution Log History</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Log ID</th>
+                        <th>Deadlock Status</th>
+                        <th>Blocked Processes</th>
+                        <th>Waiting Queue</th>
+                        <th>Resource Allocation Graph (RAG)</th>
+                        <th>Detection Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for l in logs %}
+                        <tr>
+                            <td><code>#{{ l.log_id }}</code></td>
+                            <td>
+                                {% if l.deadlockStatus == 'Deadlock Detected' %}
+                                    <span class="badge bg-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i> Deadlock Detected</span>
+                                {% else %}
+                                    <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> No Deadlock</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if l.blockedProcesses and l.blockedProcesses != 'None' %}
+                                    <span class="text-danger fw-bold">{{ l.blockedProcesses }}</span>
+                                {% else %}
+                                    <span class="text-muted">None</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ l.waitingQueue or 'None' }}</td>
+                            <td><code class="small text-truncate d-inline-block" style="max-width: 280px;">{{ l.resourceGraph or '{}' }}</code></td>
+                            <td class="small text-muted">{{ l.detectedAt.strftime('%Y-%m-%d %H:%M:%S') if l.detectedAt else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                No deadlock audit logs recorded yet. Click <strong>Trigger Deadlock Check Now</strong> to execute a scan.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

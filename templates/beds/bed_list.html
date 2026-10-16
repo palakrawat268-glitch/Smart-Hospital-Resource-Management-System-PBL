@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Bed Directory &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-bed-pulse text-primary me-2"></i>Bed Directory (Page Frames)
+        </h3>
+        <p class="text-muted mb-0">Module 4: Sujal Kumar &bull; Dynamic Memory Allocation, Deallocation & Relocation</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('bed.add_bed') }}" class="btn btn-primary fw-semibold">+ Add Bed</a>
+        <a href="{{ url_for('bed.ward_list') }}" class="btn btn-outline-success fw-semibold">Manage Wards</a>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card shadow-sm border-0 mb-4 p-3 bg-white">
+    <form method="GET" class="row g-2">
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="search" placeholder="Search by Bed Number or Type..." value="{{ searchQuery }}">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="ward">
+                <option value="">All Wards</option>
+                {% for w in wards %}
+                <option value="{{ w.wardName }}" {% if wardFilter == w.wardName %}selected{% endif %}>{{ w.wardName }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="status">
+                <option value="">All Statuses</option>
+                <option value="Available" {% if statusFilter == 'Available' %}selected{% endif %}>Available</option>
+                <option value="Occupied" {% if statusFilter == 'Occupied' %}selected{% endif %}>Occupied</option>
+                <option value="Reserved" {% if statusFilter == 'Reserved' %}selected{% endif %}>Reserved</option>
+                <option value="Maintenance" {% if statusFilter == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            <a href="{{ url_for('bed.bed_list') }}" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Beds Table -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Bed Number</th>
+                        <th>Type</th>
+                        <th>Assigned Ward</th>
+                        <th>Status</th>
+                        <th>Assigned Patient</th>
+                        <th class="text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if beds %}
+                        {% for b in beds %}
+                        <tr>
+                            <td><strong>{{ b.bedNumber }}</strong></td>
+                            <td>{{ b.bedType }}</td>
+                            <td><span class="badge bg-info-subtle text-info border">{{ b.assignedWard }}</span></td>
+                            <td>
+                                {% if b.bedStatus == 'Available' %}
+                                    <span class="badge bg-success">Available</span>
+                                {% elif b.bedStatus == 'Occupied' %}
+                                    <span class="badge bg-danger">Occupied</span>
+                                {% elif b.bedStatus == 'Reserved' %}
+                                    <span class="badge bg-warning text-dark">Reserved</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Maintenance</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if b.assignedPatient %}
+                                    <strong class="text-primary">{{ b.assignedPatient }}</strong>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-3">
+                                {% if b.bedStatus == 'Available' %}
+                                    <a href="{{ url_for('bed.assign_bed', bid=b.bed_id) }}" class="btn btn-sm btn-success me-1">Assign Patient</a>
+                                {% elif b.bedStatus == 'Occupied' %}
+                                    <a href="{{ url_for('bed.discharge_bed', bid=b.bed_id) }}" class="btn btn-sm btn-outline-secondary me-1" onclick="return confirm('Discharge patient from Bed {{ b.bedNumber }}?');">Discharge</a>
+                                    <a href="{{ url_for('bed.transfer_bed', bid=b.bed_id) }}" class="btn btn-sm btn-outline-info me-1">Transfer</a>
+                                {% endif %}
+                                <a href="{{ url_for('bed.edit_bed', bid=b.bed_id) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                                {% if b.bedStatus != 'Occupied' %}
+                                <a href="{{ url_for('bed.delete_bed', bid=b.bed_id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete bed {{ b.bedNumber }}?');">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No beds found matching criteria. Click <strong>+ Add Bed</strong> above.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

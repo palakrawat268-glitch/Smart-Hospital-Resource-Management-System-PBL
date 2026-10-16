@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Bed &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-0">
+                <h4 class="fw-bold mb-0">
+                    <i class="fa-solid fa-bed text-primary me-2"></i>{{ action }} Bed (Page Frame)
+                </h4>
+                <p class="text-muted small mb-0">Module 4: Sujal Kumar &bull; Memory Frame Registration</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bed Number / Code</label>
+                        <input type="text" name="bedNumber" class="form-control" placeholder="e.g. ICU-01 or GEN-05" value="{{ bed.bedNumber if bed else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bed Type</label>
+                        <select name="bedType" class="form-select" required>
+                            <option value="General" {% if bed and bed.bedType == 'General' %}selected{% endif %}>General</option>
+                            <option value="ICU" {% if bed and bed.bedType == 'ICU' %}selected{% endif %}>ICU / Critical Care</option>
+                            <option value="Ventilator" {% if bed and bed.bedType == 'Ventilator' %}selected{% endif %}>Ventilator Supported</option>
+                            <option value="Pediatric" {% if bed and bed.bedType == 'Pediatric' %}selected{% endif %}>Pediatric</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Assigned Ward (Memory Partition)</label>
+                        <select name="assignedWard" class="form-select" required>
+                            <option value="">Select Ward...</option>
+                            {% for w in wards %}
+                            <option value="{{ w.wardName }}" {% if bed and bed.assignedWard == w.wardName %}selected{% endif %}>{{ w.wardName }} (Capacity: {{ w.wardCapacity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Initial Status</label>
+                        <select name="bedStatus" class="form-select">
+                            <option value="Available" {% if bed and bed.bedStatus == 'Available' %}selected{% endif %}>Available (Free Frame)</option>
+                            <option value="Reserved" {% if bed and bed.bedStatus == 'Reserved' %}selected{% endif %}>Reserved</option>
+                            <option value="Maintenance" {% if bed and bed.bedStatus == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('bed.bed_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold">{{ action }} Bed</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

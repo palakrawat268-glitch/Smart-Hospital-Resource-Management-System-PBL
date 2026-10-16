@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Banker's Algorithm State &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-vault text-primary me-2"></i>Banker's Algorithm Resource Allocation State
+        </h3>
+        <p class="text-muted mb-0">Module 6: Himesh Kathait &bull; Read-only verification of Banker's matrix allocations & safety state</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('equipment.allocation_page') }}" class="btn btn-outline-danger fw-semibold">
+            <i class="fa-solid fa-scale-balanced me-1"></i> Interactive Allocation Engine
+        </a>
+        <a href="{{ url_for('report.export_csv', type='resources') }}" class="btn btn-outline-secondary fw-semibold">
+            <i class="fa-solid fa-download me-1"></i> Export Allocations (CSV)
+        </a>
+    </div>
+</div>
+
+<!-- Allocations Table -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-table text-primary me-2"></i>Resource Allocation Registry</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Allocation ID</th>
+                        <th>Equipment ID</th>
+                        <th>Patient ID</th>
+                        <th>Allocated Units</th>
+                        <th>Requested Units</th>
+                        <th>Status</th>
+                        <th>Allocated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if allocations %}
+                        {% for r in allocations %}
+                        <tr>
+                            <td><code>#{{ r.allocationId }}</code></td>
+                            <td>Eq #{{ r.equipmentId }}</td>
+                            <td><strong>{{ r.patientId }}</strong></td>
+                            <td><span class="badge bg-primary fs-6">{{ r.allocatedResources }}</span></td>
+                            <td><span class="badge bg-secondary fs-6">{{ r.requestedResources }}</span></td>
+                            <td>
+                                {% if r.resourceStatus == 'Allocated' %}
+                                    <span class="badge bg-success">Allocated</span>
+                                {% elif r.resourceStatus == 'Released' %}
+                                    <span class="badge bg-secondary">Released</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">{{ r.resourceStatus }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ r.allocatedAt.strftime('%Y-%m-%d %H:%M') if r.allocatedAt else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No resource allocations currently active.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Claims Table -->
+{% if claims %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-clipboard-check text-primary me-2"></i>Patient Maximum Need & Remaining Claims</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Patient ID</th>
+                        <th>Equipment ID</th>
+                        <th>Maximum Need</th>
+                        <th>Allocated Need</th>
+                        <th>Remaining Need</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in claims %}
+                    <tr>
+                        <td>#{{ c.claimId }}</td>
+                        <td><strong>{{ c.patientId }}</strong></td>
+                        <td>Eq #{{ c.equipmentId }}</td>
+                        <td><span class="badge bg-secondary">{{ c.maximumNeed }}</span></td>
+                        <td><span class="badge bg-primary">{{ c.allocatedNeed }}</span></td>
+                        <td><span class="badge bg-warning text-dark">{{ c.remainingNeed }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

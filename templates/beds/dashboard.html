@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Bed & Ward Overview &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-bed text-primary me-2"></i>Bed & Ward Overview (Dynamic Partitioning)
+        </h3>
+        <p class="text-muted mb-0">Module 4: Sujal Kumar &bull; Memory Management Analogy (Wards = Partitions, Beds = Frames)</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('bed.add_bed') }}" class="btn btn-primary fw-semibold">+ Add Bed</a>
+        <a href="{{ url_for('bed.add_ward') }}" class="btn btn-outline-success fw-semibold">+ Add Ward</a>
+    </div>
+</div>
+
+<!-- Critical Wards Warning Alert (> 80% Full) -->
+{% if criticalWards %}
+<div class="alert alert-danger shadow-sm border-0 mb-4 p-3" role="alert">
+    <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="fa-solid fa-triangle-exclamation fs-4"></i>
+        <h5 class="fw-bold mb-0">Critical Partition Saturation Alert (&gt;80% Capacity)!</h5>
+    </div>
+    <p class="mb-2 small">The following hospital wards have exceeded 80% occupancy. Reallocate patients or add partition frames immediately:</p>
+    <ul class="mb-0">
+        {% for w in criticalWards %}
+            <li><strong>{{ w.wardName }}</strong> ({{ w.wardType }}): {{ w.occupiedBeds }} / {{ w.wardCapacity }} beds occupied ({{ ((w.occupiedBeds / w.wardCapacity) * 100)|round(1) }}%)</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Total Wards</span>
+            <h2 class="fw-bold text-primary mt-2 mb-0">{{ stats.totalWards }}</h2>
+            <small class="text-muted">Memory Partitions</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Available Beds</span>
+            <h2 class="fw-bold text-success mt-2 mb-0">{{ stats.availableBeds }}</h2>
+            <small class="text-muted">Free Page Frames</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Occupied Beds</span>
+            <h2 class="fw-bold text-danger mt-2 mb-0">{{ stats.occupiedBeds }}</h2>
+            <small class="text-muted">Allocated to Processes</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 p-3 bg-white">
+            <span class="text-muted small text-uppercase fw-semibold">Occupancy Rate</span>
+            <h2 class="fw-bold text-warning mt-2 mb-0">{{ stats.occupancyRate }}%</h2>
+            <small class="text-muted">Overall Capacity Usage</small>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+    <a href="{{ url_for('bed.ward_list') }}" class="btn btn-outline-primary"><i class="fa-solid fa-hospital me-1"></i> View All Wards</a>
+    <a href="{{ url_for('bed.bed_list') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-bed me-1"></i> Manage Bed Directory</a>
+</div>
+{% endblock %}

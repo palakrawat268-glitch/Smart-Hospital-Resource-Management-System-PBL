@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Management &bull; Smart Hospital System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-user-doctor text-primary me-2"></i>Doctor Management & CPU Scheduling
+        </h3>
+        <p class="text-muted mb-0">Module 3: Yash Yadav &bull; Process Scheduling Algorithms (FCFS & Priority Queues)</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('os.run_fcfs') }}" class="btn btn-info text-white fw-semibold">
+            <i class="fa-solid fa-play me-1"></i> Run FCFS
+        </a>
+        <a href="{{ url_for('os.run_priority') }}" class="btn btn-warning text-dark fw-semibold">
+            <i class="fa-solid fa-bolt me-1"></i> Run Priority
+        </a>
+        <a href="{{ url_for('doctor.add_doctor') }}" class="btn btn-success fw-semibold">
+            <i class="fa-solid fa-plus me-1"></i> Add Doctor
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center">Queue Pos</th>
+                        <th>Doctor Name</th>
+                        <th>Department</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>OS Priority</th>
+                        <th>Status</th>
+                        <th class="text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if doctors %}
+                        {% for doc in doctors %}
+                        <tr>
+                            <td class="text-center">
+                                {% if doc.queuePosition and doc.queuePosition > 0 %}
+                                    <span class="badge rounded-pill bg-primary fs-6 px-3">{{ doc.queuePosition }}</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-light text-muted border">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ doc.doctorName }}</strong><br>
+                                <small class="text-muted">{{ doc.doctorEmail }}</small>
+                            </td>
+                            <td>{{ doc.doctorDepartment }}</td>
+                            <td>{{ doc.doctorSpecialization }}</td>
+                            <td>{{ doc.doctorExperience }} yr(s)</td>
+                            <td>
+                                {% if doc.priorityLevel == 'Emergency' %}
+                                    <span class="badge bg-danger">Emergency (P1)</span>
+                                {% elif doc.priorityLevel == 'High' %}
+                                    <span class="badge bg-warning text-dark">High (P2)</span>
+                                {% elif doc.priorityLevel == 'Medium' %}
+                                    <span class="badge bg-info text-dark">Medium (P3)</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Low (P4)</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if doc.doctorStatus == 'Active' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-3">
+                                <a href="{{ url_for('doctor.edit_doctor', id=doc.doctor_id) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                                <a href="{{ url_for('doctor.delete_doctor', id=doc.doctor_id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete Dr. {{ doc.doctorName }}?');">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                No doctors registered. Click <strong>Add Doctor</strong> to create profiles.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
